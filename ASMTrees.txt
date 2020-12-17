@@ -1,0 +1,163 @@
+Title AsmTrees
+INCLUDE irvine32.inc
+
+.data
+Heap dword 100 DUP(0)
+Enter1 byte "Enter a node: ",0
+Displaying byte "Tree: ",0
+minimum byte "Mininum: ",0
+maximum byte "Maximum: ",0
+Bfirst byte "BreadthFirst Traversal: ",0
+Spaces byte "  ",0
+InsertCounter1 dword 0
+mi dword 100000h
+mx dword 0
+
+.code
+
+BtreeInsert PROTO
+LevelWiseDisplay PROTO
+Min PROTO
+MAX PROTO
+BreadthFirstSearch PROTO
+
+main PROC
+
+INVOKE BtreeInsert
+INVOKE BtreeInsert
+INVOKE BtreeInsert
+INVOKE BtreeInsert
+INVOKE LevelWiseDisplay
+INVOKE Min
+INVOKE Max
+INVOKE BreadthFirstSearch
+
+EXIT
+main ENDP
+
+
+
+
+BtreeInsert PROC
+push ebp
+mov edx, offset Enter1
+call writestring
+call crlf
+call readint
+mov esi, offset heap
+mov ecx, InsertCounter1
+L1:
+	add esi, type heap
+Loop L1
+mov [esi], eax
+inc InsertCounter1
+pop ebp
+ret
+BtreeInsert ENDP
+
+
+
+
+LevelWiseDisplay PROC
+push ebp
+call crlf
+mov edx, offset Displaying
+call writestring
+call crlf
+mov esi, offset heap
+mov ecx, InsertCounter1
+L1:
+	mov eax, [esi]
+	call writedec
+	mov edx, offset Spaces
+	call writestring
+	add esi, type Heap
+Loop L1
+call crlf
+pop ebp
+ret
+LevelWiseDisplay ENDP
+
+
+
+
+
+Min PROC
+push ebp
+call crlf
+mov ecx, InsertCounter1
+mov esi, offset Heap
+L1:
+	mov eax, mi
+	cmp [esi], eax
+	jae J1
+		mov eax, [esi]
+		mov mi, eax
+	J1:
+	add esi, type heap
+Loop L1
+mov eax, mi
+mov edx, offset minimum
+call writestring
+call crlf
+call writedec
+call crlf
+pop ebp
+ret
+Min ENDP
+
+
+
+;Find Max using Search
+
+Max PROC
+push ebp
+call crlf
+mov ecx, InsertCounter1
+mov esi, offset Heap
+L1:
+	mov eax, mx
+	cmp [esi], eax
+	jbe J1
+		mov eax, [esi]
+		mov mx, eax
+	J1:
+	add esi, type heap
+Loop L1
+mov eax, mx
+mov edx, offset maximum
+call writestring
+call crlf
+call writedec
+call crlf
+pop ebp
+ret
+Max ENDP
+
+
+
+
+
+BreadthFirstSearch PROC
+push ebp
+call crlf
+mov edx, offset bfirst
+call writestring
+call crlf
+mov esi, offset heap
+mov ecx, InsertCounter1
+L1:
+	mov eax, [esi]
+	call writedec
+	mov edx, offset Spaces
+	call writestring
+	add esi, type Heap
+Loop L1
+call crlf
+pop ebp
+ret
+BreadthFirstSearch ENDP
+
+
+
+END main
