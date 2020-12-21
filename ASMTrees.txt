@@ -2,13 +2,16 @@ Title AsmTrees
 INCLUDE irvine32.inc
 
 .data
-Heap dword 100 DUP(0)
+Heap dword 100 DUP("x")
 Enter1 byte "Enter a node: ",0
 Displaying byte "Tree: ",0
 minimum byte "Mininum: ",0
 maximum byte "Maximum: ",0
 Bfirst byte "BreadthFirst Traversal: ",0
 Spaces byte "  ",0
+pre byte "Preorder Traversal: ",0
+post byte "Postorder Traversal: ",0
+inor byte "Inorder Traversal: ",0
 InsertCounter1 dword 0
 mi dword 100000h
 mx dword 0
@@ -20,18 +23,41 @@ LevelWiseDisplay PROTO
 Min PROTO
 MAX PROTO
 BreadthFirstSearch PROTO
-
+InOrder PROTO,counter1:DWORD, NodeCounter1:DWORD
+PostOrder PROto,counter2:DWORD, NodeCounter2:DWORD
+PreOrder PROTO,counter3:DWORD, NodeCounter3:DWORD
 main PROC
 
 INVOKE BtreeInsert
 INVOKE BtreeInsert
 INVOKE BtreeInsert
 INVOKE BtreeInsert
-INVOKE LevelWiseDisplay
-INVOKE Min
-INVOKE Max
-INVOKE BreadthFirstSearch
+INVOKE BtreeInsert
+INVOKE BtreeInsert
+INVOKE BtreeInsert
 
+INVOKE LevelWiseDisplay
+;INVOKE Min
+;INVOKE Max
+;INVOKE BreadthFirstSearch
+call crlf
+mov edx,OFFSET pre
+call writestring
+Invoke PreOrder,0, InsertCounter1
+call crlf
+call crlf
+
+mov edx,OFFSET post
+call writestring
+Invoke PostOrder,0, InsertCounter1
+call crlf
+call crlf
+
+mov edx,OFFSET inor
+call writestring
+Invoke InOrder,0, InsertCounter1
+call crlf
+call crlf
 EXIT
 main ENDP
 
@@ -157,6 +183,129 @@ call crlf
 pop ebp
 ret
 BreadthFirstSearch ENDP
+
+
+
+InOrder PROC,counter1:DWORD, NodeCounter1:DWORD
+push ebp
+mov eax,counter1
+cmp eax, NodeCounter1
+jb j1
+pop ebp
+ret 8
+
+j1:
+
+mov eax,counter1
+mov ebx,2
+mul ebx
+add eax,1
+mov counter1,eax
+
+Invoke InOrder,counter1,NodeCounter1
+dec counter1
+mov eax,counter1
+mov edx,0
+mov ebx,2
+div ebx
+mov counter1,eax
+mov esi,counter1
+mov eax,Heap[esi*Type Heap]
+call writedec
+mov edx,OFFSET spaces
+call writestring
+mov eax,counter1
+mul ebx
+add eax,2
+mov counter1,eax
+
+Invoke InOrder,counter1,NodeCounter1
+sub counter1,2
+mov eax,counter1
+mov edx,0
+mov ebx,2
+div ebx
+mov counter1,eax
+pop ebp
+ret 8
+InOrder ENDP
+
+
+PostOrder PROC,counter2:DWORD, NodeCounter2:DWORD
+push ebp
+mov eax,counter2
+cmp eax, NodeCounter2
+jb j1
+pop ebp
+ret 8
+
+j1:
+
+mov eax,counter2
+mov ebx,2
+mul ebx
+add eax,1
+mov counter2,eax
+
+Invoke PostOrder,counter2,NodeCounter2
+inc counter2
+
+Invoke PostOrder,counter2,NodeCounter2
+sub counter2,2
+mov eax,counter2
+mov edx,0
+mov ebx,2
+div ebx
+mov counter2,eax
+
+mov esi,counter2
+mov eax,Heap[esi*Type Heap]
+call writedec
+mov edx,OFFSET spaces
+call writestring
+
+pop ebp
+ret 8
+PostOrder ENDP
+
+
+PreOrder PROC,counter3:DWORD, NodeCounter3:DWORD
+push ebp
+mov eax,counter3
+cmp eax, NodeCounter3
+jb j1
+pop ebp
+ret 8
+
+j1:
+mov esi,counter3
+mov eax,Heap[esi*Type Heap]
+call writedec
+mov edx,OFFSET spaces
+call writestring
+
+mov eax,counter3
+mov ebx,2
+mul ebx
+add eax,1
+mov counter3,eax
+
+Invoke PreOrder,counter3,NodeCounter3
+inc counter3
+
+Invoke PreOrder,counter3,NodeCounter3
+sub counter3,2
+mov eax,counter3
+mov edx,0
+mov ebx,2
+div ebx
+mov counter3,eax
+
+
+
+pop ebp
+ret 8
+PreOrder ENDP
 
 
 
