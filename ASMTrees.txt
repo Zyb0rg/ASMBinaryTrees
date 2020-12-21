@@ -4,10 +4,12 @@ INCLUDE irvine32.inc
 .data
 Heap dword 100 DUP("x")
 Enter1 byte "Enter a node: ",0
-Displaying byte "Tree: ",0
+Displaying byte "LevelWise Tree: ",0
 minimum byte "Mininum: ",0
 maximum byte "Maximum: ",0
+size1 byte "Size of the Tree: ",0
 Bfirst byte "BreadthFirst Traversal: ",0
+Dfirst byte "DepthFirst Traversal: ",0
 Spaces byte "  ",0
 pre byte "Preorder Traversal: ",0
 post byte "Postorder Traversal: ",0
@@ -19,13 +21,20 @@ mx dword 0
 .code
 
 BtreeInsert PROTO
-LevelWiseDisplay PROTO
+DisplayLevelWise PROTO
+TreeSize PROTO
 Min PROTO
 MAX PROTO
 BreadthFirstSearch PROTO
+DepthFirstSearch PROTO
+DisplayPreOrder PROTO
+DisplayPostOrder PROTO
+DisplayInOrder PROTO
 InOrder PROTO,counter1:DWORD, NodeCounter1:DWORD
-PostOrder PROto,counter2:DWORD, NodeCounter2:DWORD
+PostOrder PROTO,counter2:DWORD, NodeCounter2:DWORD
 PreOrder PROTO,counter3:DWORD, NodeCounter3:DWORD
+CalculateDepthFirst PROTO,counter4:DWORD, NodeCounter4:DWORD
+
 main PROC
 
 INVOKE BtreeInsert
@@ -36,30 +45,81 @@ INVOKE BtreeInsert
 INVOKE BtreeInsert
 INVOKE BtreeInsert
 
-INVOKE LevelWiseDisplay
-;INVOKE Min
-;INVOKE Max
-;INVOKE BreadthFirstSearch
+INVOKE TreeSize
+INVOKE Min
+INVOKE Max
+INVOKE DisplayLevelWise
+INVOKE DepthFirstSearch
+INVOKE BreadthFirstSearch
+INVOKE DisplayPreOrder
+INVOKE DisplayPostOrder
+INVOKE DisplayInOrder
+
+EXIT
+main ENDP
+
+
+
+
+DisplayPreOrder PROC
+push ebp
 call crlf
 mov edx,OFFSET pre
 call writestring
 Invoke PreOrder,0, InsertCounter1
 call crlf
 call crlf
+pop ebp
+ret
+DisplayPreOrder ENDP
 
+
+
+
+DisplayPostOrder PROC
+push ebp
+call crlf
 mov edx,OFFSET post
 call writestring
 Invoke PostOrder,0, InsertCounter1
 call crlf
 call crlf
+pop ebp
+ret
+DisplayPostOrder ENDP
 
+
+
+
+
+DisplayInOrder PROC
+push ebp
+call crlf
 mov edx,OFFSET inor
 call writestring
 Invoke InOrder,0, InsertCounter1
 call crlf
 call crlf
-EXIT
-main ENDP
+pop ebp
+ret
+DisplayInOrder ENDP
+
+
+
+
+
+DepthFirstSearch PROC
+push ebp
+call crlf
+mov edx,OFFSET Dfirst
+call writestring
+Invoke CalculateDepthFirst,0, InsertCounter1
+call crlf
+call crlf
+pop ebp
+ret
+DepthFirstSearch ENDP
+
 
 
 
@@ -84,12 +144,11 @@ BtreeInsert ENDP
 
 
 
-LevelWiseDisplay PROC
+DisplayLevelWise PROC
 push ebp
 call crlf
 mov edx, offset Displaying
 call writestring
-call crlf
 mov esi, offset heap
 mov ecx, InsertCounter1
 L1:
@@ -100,9 +159,10 @@ L1:
 	add esi, type Heap
 Loop L1
 call crlf
+call crlf
 pop ebp
 ret
-LevelWiseDisplay ENDP
+DisplayLevelWise ENDP
 
 
 
@@ -125,8 +185,8 @@ Loop L1
 mov eax, mi
 mov edx, offset minimum
 call writestring
-call crlf
 call writedec
+call crlf
 call crlf
 pop ebp
 ret
@@ -134,7 +194,8 @@ Min ENDP
 
 
 
-;Find Max using Search
+
+
 
 Max PROC
 push ebp
@@ -153,8 +214,8 @@ Loop L1
 mov eax, mx
 mov edx, offset maximum
 call writestring
-call crlf
 call writedec
+call crlf
 call crlf
 pop ebp
 ret
@@ -169,7 +230,6 @@ push ebp
 call crlf
 mov edx, offset bfirst
 call writestring
-call crlf
 mov esi, offset heap
 mov ecx, InsertCounter1
 L1:
@@ -180,9 +240,12 @@ L1:
 	add esi, type Heap
 Loop L1
 call crlf
+call crlf
 pop ebp
 ret
 BreadthFirstSearch ENDP
+
+
 
 
 
@@ -231,6 +294,9 @@ ret 8
 InOrder ENDP
 
 
+
+
+
 PostOrder PROC,counter2:DWORD, NodeCounter2:DWORD
 push ebp
 mov eax,counter2
@@ -269,6 +335,9 @@ ret 8
 PostOrder ENDP
 
 
+
+
+
 PreOrder PROC,counter3:DWORD, NodeCounter3:DWORD
 push ebp
 mov eax,counter3
@@ -301,11 +370,70 @@ mov ebx,2
 div ebx
 mov counter3,eax
 
-
-
 pop ebp
 ret 8
 PreOrder ENDP
+
+
+
+
+TreeSize PROC
+push ebp
+mov ecx, insertCounter1
+mov eax, 0
+L1:
+	inc eax
+Loop L1
+mov edx, offset size1
+call crlf
+call writestring
+call writedec
+call crlf
+call crlf
+pop ebp
+ret
+TreeSize ENDP
+
+
+
+
+CalculateDepthFirst PROC,counter4:DWORD, NodeCounter4:DWORD
+push ebp
+mov eax,counter4
+cmp eax, NodeCounter4
+jb j1
+pop ebp
+ret 8
+
+j1:
+
+mov eax,counter4
+mov ebx,2
+mul ebx
+add eax,1
+mov counter4,eax
+
+Invoke CalculateDepthFirst,counter4,NodeCounter4
+inc counter4
+
+Invoke CalculateDepthFirst,counter4,NodeCounter4
+sub counter4,2
+mov eax,counter4
+mov edx,0
+mov ebx,2
+div ebx
+mov counter4,eax
+
+mov esi,counter4
+mov eax,Heap[esi*Type Heap]
+call writedec
+mov edx,OFFSET spaces
+call writestring
+
+pop ebp
+ret 8
+CalculateDepthFirst ENDP
+
 
 
 
